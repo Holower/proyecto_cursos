@@ -6,7 +6,7 @@ if (!empty($_POST)) {
     $alert='<p class"msg_Error">todos los campos son obligatorios</p>';
   }else {
     include "../conection.php";
-
+    
     $codigo_usuario = $_POST['codigo_usuario'];
     $contraseña = $_POST['contraseña'];
     $id_rol = $_POST['id_rol'];
@@ -14,29 +14,33 @@ if (!empty($_POST)) {
     $apellido = $_POST['apellido'];
     $correo = $_POST['correo'];
 
-    $query=mysqli_query($conn, "SELECT * FROM usuario WHERE codigo='$codigo_usuario' OR correo = '$correo'");
-    $result = mysqli_fetch_array($query);
-    if ($result>0) {
-      $alert = '<p class="msg_Error">El codigo o el correo ya existe</p>';
-    }else {
-      $query_insert = mysqli_query($conn, "INSERT INTO usuario(codigo,contraseña,id_rol,nombre,apellido,correo) VALUES($codigo_usuario,$contraseña,$id_rol,$nombre,$apellido,$correo)");
-    /*  if ($id_rol==1) {
-        $query_insert2 = mysqli_query($conn, "INSERT INTO administrador(codigo) VALUES($codigo)");
-      }elseif ($id_rol==2) {
-        $query_insert2 = mysqli_query($conn, "INSERT INTO docente(codigo) VALUES($codigo)");
-      }else {
-        $query_insert2 = mysqli_query($conn, "INSERT INTO estudiante(codigo) VALUES($codigo)");
-      }*/
-      if ($query_insert) {
-        $alert='<p class="msg_Save">Usuario creado correctamente.</p>';
-      }else {
-        $alert='<p class="msg_Error">Error al crear al Usuario.</p>';
-      }
-      }
+    $insertar="INSERT INTO usuario(codigo_usuario,contraseña,id_rol,nombre,apellido,correo) VALUES ($codigo_usuario,$contraseña,$id_rol,$nombre,$apellido,$correo)";
+
+    $verificar_usuario=mysqli_query($conn, "SELECT * FROM usuario WHERE codigo_usuario='$codigo_usuario'");
+    if(mysqli_num_rows($verificar_usuario)>0){
+    echo "el usuario ya esta registrado";
+    $alert='<p class"msg_Error">El usuario ya esta registrado</p>';
+    exit;
     }
+    $verificar_correo=mysqli_query($conn, "SELECT * FROM usuario WHERE correo='$correo'");
+    if(mysqli_num_rows($verificar_correo)>0){
+    echo "el usuario ya esta registrado";
+    $alert='<p class"msg_Error">El usuario ya esta registrado</p>';
+    exit;
+    }
+    $resultado = mysqli_query($conn,$insertar);
+    if (!$resultado) {
+      echo "erro al registrarase";
+      $alert='<p class"msg_Error">Error al registrarse</p>';
+    }else {
+      $alert='<p class"msg_Error">El usuarior se registro exitosamente</p>';
+      echo "usuario registrado exitosamente";
+    }
+    mysqli_close($conn);
+}
 }
  ?>
- 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -63,8 +67,8 @@ if (!empty($_POST)) {
 				<input type="text" name="apellido" id="apellido" placeholder="ingrese apellido">
         <label for="correo">Correo</label>
 				<input type="email" name="correo" id="correo" placeholder="Correo electrónico">
-        <label for="rol">Tipo de usuario</label>
-        <select name="rol" id="id_rol">
+        <label for="id_rol">Tipo de usuario</label>
+        <select name="id_rol" id="id_rol">
           <option value="1">Administrador</option>
           <option value="2">Docente</option>
           <option value="3">Estudiante</option>
