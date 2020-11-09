@@ -1,21 +1,34 @@
 <?php
+session_start();
 $alert = '';
+if (!empty($_SESSION['active'])) {
+  header('location: sistema/');
+}else {
+
 if (!empty($_POST))
 {
   if (empty($_POST['code']) || empty($_POST['password'])) {
   	$alert = 'ingrese su codigo y contraseña';
   }else
 	{
-		 require_once 'conection.php';
-		 $code = $_POST['code'];
-		 $password = $_POST['password'];
-		 $query = mysqli_query($conn, "SELECT * FROM usuario WHERE codigo_usuario = '$code' AND contraseña = '$password'");
-		 $result = mysqli_num_rows($query);
-		 		 if ($result > 0) {
-					 $data = mysqli_fetch_array($query);
-					 print_r($data);
-				 }
-			 }
+		require_once 'conection.php';
+		$code = $_POST['code'];
+		$password = $_POST['password'];
+		$query = mysqli_query($conn, "SELECT * FROM usuario WHERE codigo_usuario = '$code' AND contraseña = '$password'");
+		$result = mysqli_num_rows($query);
+		if ($result > 0)
+		{
+			$data = mysqli_fetch_array($query);
+			$_SESSION['active'] = true;
+      $_SESSION['codigo_usuari'] = $data['codigo_usuario'];
+      $_SESSION['rol'] = $data['rol'];
+      header('location: sistema/');
+		}else {
+      $alert = 'El codigo o la contraseña son incorrectos';
+      session_destroy();
+    }
+	}
+}
 }
  ?>
 <!DOCTYPE html>
@@ -39,6 +52,7 @@ if (!empty($_POST))
 		<form action="" method="post">
 			<input type="text" name="code" placeholder="Enter your code">
 			<input type="password" name="password" placeholder="Enter your password">
+      <div clas="alert"><?php echo isset($alert) ? $alert : '' ; ?></div>
 			<input type="submit" value="Log In">
 		</form>
 	</div>
