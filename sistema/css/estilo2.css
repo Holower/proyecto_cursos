@@ -217,6 +217,6 @@ input,select{
 .msg_Save{
 	color: #126e00;
 }
-p{
+.alert p{
 	padding: 10px;
 }
