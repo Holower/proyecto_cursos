@@ -12,16 +12,20 @@ if (!empty($_POST))
   }else
 	{
 		require_once 'conection.php';
-		$code = $_POST['code'];
-		$password = $_POST['password'];
+		$code = mysqli_real_escape_string($conn,$_POST['code']);
+		$password = md5(mysqli_real_escape_string($conn,$_POST['password']));
 		$query = mysqli_query($conn, "SELECT * FROM usuario WHERE codigo_usuario = '$code' AND contraseña = '$password'");
 		$result = mysqli_num_rows($query);
 		if ($result > 0)
 		{
 			$data = mysqli_fetch_array($query);
 			$_SESSION['active'] = true;
-      $_SESSION['codigo_usuari'] = $data['codigo_usuario'];
-      $_SESSION['rol'] = $data['rol'];
+      $_SESSION['codigo_usuario'] = $data['codigo_usuario'];
+      $_SESSION['nombre'] = $data['nombre'];
+      $_SESSION['apellido'] = $data['apellido'];
+      $_SESSION['correo'] = $data['correo'];
+
+
       header('location: sistema/');
 		}else {
       $alert = 'El codigo o la contraseña son incorrectos';
